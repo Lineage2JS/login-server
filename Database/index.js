@@ -1,26 +1,37 @@
-const MongoClient = require("mongodb").MongoClient;
+const { Client } = require('pg');
 
 class Database {
   constructor() {
-    this._db = null;
+    this._client = null;
   }
 
-  async connect(host, dbname, callback) {
+  async connect(username, password, host, port,  dbname, callback) {
+    this._client = new Client({
+      user: username,
+      password,
+      host,
+      port,
+      database: dbname,
+    });
+    
     try {
-      const mongoClient = new MongoClient(`mongodb://${host}/`);
+      await this._client.connect();
 
-      await mongoClient.connect();
-      
-      this._db = mongoClient.db(dbname);
-
-      callback();
-    } catch {
-      throw new Error("database connected: failed");
+      callback()
+    } catch(e) {
+      throw new Error(`database connected: failed (${e.message})`);
     }
   }
   
-  async getUserByLogin(login) {
-    const user = await this._db.collection('users').findOne({ login });
+  async getUserByLogin(userLogin) {
+    const result = await this._client.query(`
+      SELECT 
+      user_login AS login,
+      user_password AS password
+      FROM users
+      WHERE user_login = $1
+    `, [userLogin]);
+    const user = result.rows[0];
 
     if (user) {
       return user;
@@ -29,160 +40,33 @@ class Database {
     }
   }
 
-  async addCharacter(character) {
-    const document = {};
+  async getOnlineCharactersCount() {
+    const result = await this._client.query(`
+      SELECT COUNT(*) as online_count
+      FROM characters
+      WHERE online = true
+    `);
+    const onlineCharactersCount = result.rows[0].online_count;
 
-    for (const key in character) {
-      if (key.startsWith('_')) {
-        continue;
-      }
-
-      document[key] = character[key];
-    }
-
-    await this._db.collection('characters').insertOne(document);
-  }
-
-  async updateCharacterByObjectId(objectId, character) {
-    await this._db.collection('characters').updateOne(
-      { objectId },
-      {
-        $set: {
-          x: character.x,
-          y: character.y,
-          z: character.z
-        }
-      }
-    ); // fix?
-  }
-
-  async getCharacterByLogin(login) { // fix byUserLogin? PlayerLogin?
-    return await this._db.collection('characters').findOne({ login });
-  }
-
-  async getCharactersByLogin(login) { // fix delete
-    return await this._db.collection('characters').find({ login }).toArray();
-  }
-
-  async getCharacterByObjectId(objectId) {
-    return await this._db.collection('characters').findOne({ objectId });
-  }
-
-  async checkCharacterNameExists(characterName) {
-    const character = await this._db.collection('characters').findOne({
-      'characterName': {
-        $regex: `^${characterName}$`,
-        $options: 'i'
-      }
-    });
-
-    if (character) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  async getCharactersOnline() {
-    const characters = await this._db.collection('characters').find({ online: true }).toArray();
-
-    return characters.length;
-  }
-
-  async getNextObjectId() {
-    const objectId = await this._db.collection('counters').findOne(
-      {
-        "objectId": {
-          $exists : true
-        }
-      },
-      {
-        projection: {
-          _id: 0,
-          "last": "$objectId.last",
-          "start": "$objectId.start",
-        }
-      }
-    );
-    
-    await this._db.collection('counters').updateOne(
-      {
-        "objectId": { 
-          $exists : true 
-        }
-      },
-      {
-        $inc: {
-          "objectId.last": 1
-        }
-      }
-    );
-    
-    return objectId.start + objectId.last;
-  }
-
-  async deleteCharacterByObjectId(objectId) {
-    await this._db.collection('characters').deleteOne({ objectId });
-  }
-
-  async addGameServer(params) {
-    await this._db.collection('gameservers').insertOne({
-      id: params.id, 
-      host: params.host,
-      port: params.port,
-      ageLimit: params.ageLimit,
-      isPvP: params.isPvP,
-      maxPlayers: params.maxPlayers,
-      status: params.status,
-      type: params.type
-    });
+    return onlineCharactersCount;
   }
 
   async getGameServers() {
-    return await this._db.collection('gameservers').find().toArray();
-  }
+    const result = await this._client.query(`
+      SELECT
+      id,
+      host,
+      port,
+      age_limit AS "ageLimit",
+      is_pvp AS "isPvP",
+      max_players AS "maxPlayers",
+      server_status AS status,
+      server_type AS type
+      FROM gameservers
+    `);
+    const gameservers = result.rows;
 
-  async getGameServerById(id) {
-    const gameserver = await this._db.collection('gameservers').findOne({ id });
-
-    if (gameserver) {
-      return gameserver;
-    } else {
-      return null;
-    }
-  }
-
-  async checkGameServerExistsById(id) {
-    const gameserver = await this._db.collection('gameservers').findOne({ id });
-
-    if (gameserver) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  async updateGameServerById(id, field, value) {
-    await this._db.collection('gameservers').updateOne(
-      { id },
-      {
-        $set: {
-          [field]: value
-        }
-      }
-    );
-  }
-
-  async addInventory(document) {
-    await this._db.collection('inventories').insertOne(document);
-  }
-
-  async getInventoryByObjectId(objectId) {
-    return await this._db.collection('inventories').findOne({ objectId });
-  }
-
-  async deleteInventoryByObjectId(objectId) {
-    await this._db.collection('inventories').deleteOne({ objectId });
+    return gameservers;
   }
 }
 

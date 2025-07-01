@@ -1,7 +1,7 @@
 const ServerPacket = require('./ServerPacket.js');
 
 class ServerList {
-  constructor(gameservers, playersOnline) {
+  constructor(gameservers, onlineCharactersCount) {
     this._packet = new ServerPacket();
     this._packet.writeC(0x04)
       .writeC(gameservers.length)
@@ -19,7 +19,7 @@ class ServerList {
       .writeD(gameserver.port)
       .writeC(gameserver.ageLimit)
       .writeC(gameserver.isPvP ? 0x01 : 0x00)
-      .writeH(playersOnline)
+      .writeH(onlineCharactersCount)
       .writeH(gameserver.maxPlayers)
       .writeC(gameserver.status)
       .writeD(gameserver.type);

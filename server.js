@@ -5,8 +5,14 @@ const server = new Server();
 
 async function run() {
   try {
-    await database.connect(config.database.host, config.database.dbname, () => {
-      console.log("database connected: success");
+    await database.connect(
+      config.database.username,
+      config.database.password,
+      config.database.host,
+      config.database.port,
+      config.database.dbname,
+      () => {
+        console.log("database connected: success");
     });
   } catch(e) {
     console.log(e.message);

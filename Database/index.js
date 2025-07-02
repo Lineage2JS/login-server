@@ -42,11 +42,12 @@ class Database {
 
   async getOnlineCharactersCount() {
     const result = await this._client.query(`
-      SELECT COUNT(*) as online_count
+      SELECT
+      COUNT(*) AS "onlineCount"
       FROM characters
       WHERE online = true
     `);
-    const onlineCharactersCount = result.rows[0].online_count;
+    const onlineCharactersCount = result.rows[0].onlineCount;
 
     return onlineCharactersCount;
   }

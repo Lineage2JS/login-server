@@ -1,4 +1,4 @@
-const Server = require('./LoginServer/Server');
+const Server = require('./Core/Server');
 const database = require('./Database');
 const config = require('./config');
 const server = new Server();

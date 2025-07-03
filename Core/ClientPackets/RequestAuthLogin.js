@@ -22,15 +22,15 @@ class RequestAuthLogin {
   }
 
   async _init() {
-    const user = await database.getUserByLogin(this.login);
+    const account = await database.getAccountByLogin(this.login);
 
-    if (!user) {
+    if (!account) {
       this._client.sendPacket(new serverPackets.LoginFail(serverPackets.LoginFail.reason.REASON_USER_OR_PASS_WRONG));
 
       return;
     }
 
-    if (user.password !== this.password) {
+    if (account.password !== this.password) {
       this._client.sendPacket(new serverPackets.LoginFail(serverPackets.LoginFail.reason.REASON_PASS_WRONG));
 
       return;

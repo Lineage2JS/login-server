@@ -23,18 +23,19 @@ class Database {
     }
   }
   
-  async getUserByLogin(userLogin) {
+  async getAccountByLogin(login) {
     const result = await this._client.query(`
       SELECT 
-      user_login AS login,
-      user_password AS password
-      FROM users
-      WHERE user_login = $1
-    `, [userLogin]);
-    const user = result.rows[0];
+      login,
+      password,
+      access_level AS "accessLevel"
+      FROM accounts
+      WHERE login = $1
+    `, [login]);
+    const account = result.rows[0];
 
-    if (user) {
-      return user;
+    if (account) {
+      return account;
     } else {
       return null;
     }

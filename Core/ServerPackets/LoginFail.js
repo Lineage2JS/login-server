@@ -3,7 +3,8 @@ const ServerPacket = require('./ServerPacket.js');
 class LoginFail {
   constructor(reason) {
     this._packet = new ServerPacket();
-    this._packet.writeC(0x01)
+    this._packet
+      .writeC(0x01)
       .writeC(reason);
   }
 

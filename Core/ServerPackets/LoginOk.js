@@ -3,7 +3,8 @@ const ServerPacket = require('./ServerPacket.js');
 class LoginOk {
   constructor(sessionKey1) {
     this._packet = new ServerPacket();
-    this._packet.writeC(0x03)
+    this._packet
+      .writeC(0x03)
       .writeD(sessionKey1[0])
       .writeD(sessionKey1[1])
       .writeD(0x00)

@@ -3,7 +3,8 @@ const ServerPacket = require('./ServerPacket.js');
 class PlayFail {
   constructor(reason) {
     this._packet = new ServerPacket();
-    this._packet.writeC(0x06)
+    this._packet
+      .writeC(0x06)
       .writeC(reason);
   }
 

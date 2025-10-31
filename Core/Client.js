@@ -1,5 +1,5 @@
 const config = require('./../config')
-const BlowfishEngine = require('./libs/blowfish.js');
+const BlowfishEngine = require('./../utils/blowfish.js');
 const blowfish = new BlowfishEngine(config.main.encryptionKeys.blowfish);
 const clientPackets = require('./ClientPackets/clientPackets');
 const serverPackets = require('./ServerPackets/serverPackets');

@@ -1,6 +1,6 @@
 const serverPackets = require('./../ServerPackets/serverPackets');
 const ClientPacket = require("./ClientPacket");
-const database = require('./../../Database');
+const database = require('./../../database');
 
 class RequestServerList {
   constructor(client, packet) {

@@ -1,5 +1,5 @@
 const Server = require('./core/Server');
-const database = require('./Database');
+const database = require('./database');
 const config = require('./config');
 const server = new Server();
 

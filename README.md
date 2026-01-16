@@ -1,4 +1,4 @@
-# Login server.
+# Login server
 
 ![logo](ls.png)
 

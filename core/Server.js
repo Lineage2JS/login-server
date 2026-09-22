@@ -9,14 +9,12 @@ class Server {
   start(host, port, callback) {
     this._server = net.createServer(this._handler.bind(this));
 
-    this._server.on('listening', this._onListening.bind(this, host, port, callback));
+    this._server.on('listening', this._onListening.bind(this, callback));
     this._server.on('connection', this._onConnection);
     this._server.listen(port, host);
   }
 
-  _onListening(host, port, callback) {
-    console.log(`login server listening on ${host}:${port}`);
-
+  _onListening(callback) {
     callback();
   }
 

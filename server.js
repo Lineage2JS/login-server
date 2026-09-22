@@ -3,7 +3,9 @@ const database = require('./database');
 const config = require('./config');
 const server = new Server();
 
-async function run() {
+async function init() {
+  console.log('starting login server...');
+
   try {
     await database.connect(
       config.database.username,
@@ -22,18 +24,11 @@ async function run() {
 
   try {
     server.start(config.loginserver.host, config.loginserver.port, () => {
-      // console.log('\n');
-      // console.log('########################################');
-      // console.log('# lineage2js                           #');
-      // console.log('# login server                         #');
-      // console.log('# Chronicle ....... %s                 #', 'C1');
-      // console.log('# Protocol ........ %d                #', 419);
-      // console.log('########################################');
-      // console.log('\n');
+      console.log(`login server listening on ${config.loginserver.host}:${config.loginserver.port}`);
     });
-  } catch {
-
+  } catch(e) {
+    console.error(e);
   }
 }
 
-run();
+init();
